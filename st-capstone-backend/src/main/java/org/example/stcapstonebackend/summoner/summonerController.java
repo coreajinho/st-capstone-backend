@@ -1,4 +1,14 @@
-//package org.example.stcapstonebackend.summoner;
-//
-//public class summonerController {
-//}
+package org.example.stcapstonebackend.summoner;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/summoner")
+@RequiredArgsConstructor
+public class SummonerController {
+    private final SummonerService summonerService;
+
+    public
+}

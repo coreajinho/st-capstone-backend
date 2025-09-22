@@ -1,5 +1,7 @@
 //package org.example.stcapstonebackend.summoner;
 //
-//public class summonerRepository {
+//import org.springframework.data.jpa.repository.JpaRepository;
+//
+//public class summonerRepository extends JpaRepository<Summoner,Long> {
 //
 //}
