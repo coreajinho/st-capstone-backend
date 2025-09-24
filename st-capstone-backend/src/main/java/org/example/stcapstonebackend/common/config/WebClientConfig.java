@@ -11,13 +11,19 @@ public class WebClientConfig {
     @Value("${riot.api.key}")
     private String apiKey;
 
-    @Value("${riot.api.url}")
-    private String apiUrl;
+    @Bean
+    public WebClient riotKrWebClient() {
+        return createRiotWebClient("kr");
+    }
 
     @Bean
-    public WebClient webClient() {
+    public WebClient riotAsiaWebClient() {
+        return createRiotWebClient("asia");
+    }
+
+    private WebClient createRiotWebClient(String region) {
         return WebClient.builder()
-                .baseUrl(apiUrl)
+                .baseUrl(String.format("https://%s.api.riotgames.com", region))
                 .defaultHeader("X-Riot-Token", apiKey)
                 .build();
     }

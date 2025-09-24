@@ -1,10 +1,14 @@
 package org.example.stcapstonebackend.summoner.dto;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record SummonerSearchResponseDto(
         String nickname,
-        String tag,
+        String tagline,
+        String puuid,
         String soloTier,
         String soloDivision,
         int soloPoints,
@@ -12,10 +16,10 @@ public record SummonerSearchResponseDto(
         int soloLoses,
         String flexTier,
         String flexDivision,
-        String flexPoints,
-        String flexWins,
-        String flexLoses,
-        List<String> recentMatchIds
+        int flexPoints,
+        int flexWins,
+        int flexLoses
+//        ,List<MatchDetailDto> recentMatchs
 ) {
 }
 
