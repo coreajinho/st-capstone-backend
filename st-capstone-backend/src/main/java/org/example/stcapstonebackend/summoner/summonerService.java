@@ -72,11 +72,6 @@ public class SummonerService {
                 .flexWins(flexRankOptional.map(LeagueEntryDto::wins).orElse(0))
                 .flexLoses(flexRankOptional.map(LeagueEntryDto::losses).orElse(0))
                 .build();
-//    public SummonerSearchResponseDto searchSummoner(String fullname){
-//        RiotAccountDto riotAccountResponse = getRiotAccount(fullname);
-//        String puuid = riotAccountResponse.puuid();
-//        List<LeagueEntryDto> riotLegueEntryResponse = getLeagueEntry(puuid);
-
 
 //        List<MatchDetailDto> matches = getMatchlist(puuid);
 //        //SummonerSearchResponseDto 생성 코드
