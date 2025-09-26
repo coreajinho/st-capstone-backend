@@ -1,8 +1,10 @@
 package org.example.stcapstonebackend.common.client;
 
 import lombok.RequiredArgsConstructor;
-import org.example.stcapstonebackend.summoner.dto.LeagueEntryDto;
-import org.example.stcapstonebackend.summoner.dto.RiotAccountDto;
+import org.example.stcapstonebackend.common.client.dto.LeagueEntryDto;
+import org.example.stcapstonebackend.common.client.dto.MatchDto;
+import org.example.stcapstonebackend.common.client.dto.RiotAccountDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -28,5 +30,26 @@ public class RiotApiClient {
                 .uri("/lol/league/v4/entries/by-puuid/{encryptedPUUID}", encryptedPUUID)
                 .retrieve()
                 .bodyToFlux(LeagueEntryDto.class);
+    }
+
+    public Mono<List<String>> fetchMatchIdsByPuuid(String puuid, int count) {
+        return riotAsiaWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/lol/match/v5/matches/by-puuid/{puuid}/ids")
+                        .queryParam("count", count)
+                        .build(puuid))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {});
+    }
+
+    public Mono<List<String>> fetchMatchIdsByPuuid(String puuid) {
+        return fetchMatchIdsByPuuid(puuid, 10);
+    }
+
+    public Mono<MatchDto> fetchMatchByMatchId(String matchId) {
+        return riotAsiaWebClient.get()
+                .uri("/lol/match/v5/matches/{matchId}", matchId)
+                .retrieve()
+                .bodyToMono(MatchDto.class);
     }
 }
