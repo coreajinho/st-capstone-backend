@@ -3,8 +3,9 @@ package org.example.stcapstonebackend.summoner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.stcapstonebackend.common.client.RiotApiClient;
-import org.example.stcapstonebackend.summoner.dto.LeagueEntryDto;
-import org.example.stcapstonebackend.summoner.dto.RiotAccountDto;
+import org.example.stcapstonebackend.common.client.dto.LeagueEntryDto;
+import org.example.stcapstonebackend.common.client.dto.MatchDto;
+import org.example.stcapstonebackend.common.client.dto.RiotAccountDto;
 import org.example.stcapstonebackend.summoner.dto.SummonerSearchResponseDto;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,8 +19,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SummonerService {
     private final RiotApiClient riotApiClient;
+
     public RiotAccountDto getRiotAccount(String fullname) {
-        String[] ids=  fullname.split("#");
+        String[] ids=  fullname.trim().split("#");
         String gameName = ids[0];
         String tagLine = ids[1];
         RiotAccountDto account = riotApiClient.fetchAccountByRiotId(gameName, tagLine)
@@ -32,9 +34,13 @@ public class SummonerService {
         return dtoList.block();
     }
 
-//    public List<MatchDetailDto> getMatchlist(String puuid){
-//
-//    }
+    public Mono<List<String>> getMatchlist(String puuid){
+        return riotApiClient.fetchMatchIdsByPuuid(puuid);
+    }
+
+    public Mono<MatchDto> getMatch(String matchId){
+        return riotApiClient.fetchMatchByMatchId(matchId);
+    }
 
     public SummonerSearchResponseDto searchSummoner(String fullname) {
         // 닉네임과 태그로 puuid, 게임 닉네임 등 기본 정보를 조회
@@ -59,22 +65,18 @@ public class SummonerService {
                 .nickname(riotAccountResponse.gameName())
                 .tagline(riotAccountResponse.tagLine())
                 .puuid(puuid)
-                // 솔로 랭크 정보가 있으면 값을 채우고, 없으면(Optional이 비어있으면) 기본값(Unranked, 0)을 사용합니다.
+                // 솔로 랭크 정보가 있으면 값을 채우고, 없으면(Optional이 비어있으면) 기본값(Unranked, 0) 사용
                 .soloTier(soloRankOptional.map(LeagueEntryDto::tier).orElse("UNRANKED"))
                 .soloDivision(soloRankOptional.map(LeagueEntryDto::rank).orElse(""))
                 .soloPoints(soloRankOptional.map(LeagueEntryDto::leaguePoints).orElse(0))
                 .soloWins(soloRankOptional.map(LeagueEntryDto::wins).orElse(0))
                 .soloLoses(soloRankOptional.map(LeagueEntryDto::losses).orElse(0))
-                // 자유 랭크 정보가 있으면 값을 채우고, 없으면 기본값을 사용합니다.
+                // 자유 랭크 정보가 있으면 값을 채우고, 없으면 기본값 사용
                 .flexTier(flexRankOptional.map(LeagueEntryDto::tier).orElse("UNRANKED"))
                 .flexDivision(flexRankOptional.map(LeagueEntryDto::rank).orElse(""))
                 .flexPoints(flexRankOptional.map(LeagueEntryDto::leaguePoints).orElse(0))
                 .flexWins(flexRankOptional.map(LeagueEntryDto::wins).orElse(0))
                 .flexLoses(flexRankOptional.map(LeagueEntryDto::losses).orElse(0))
                 .build();
-
-//        List<MatchDetailDto> matches = getMatchlist(puuid);
-//        //SummonerSearchResponseDto 생성 코드
-//        return SummonerSearchResponseDto;
     }
 }
