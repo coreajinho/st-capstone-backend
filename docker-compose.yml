@@ -1,11 +1,10 @@
-
 services:
   mysql:
     image: mysql:8.0
     container_name: capstone_mysql
     environment:
       MYSQL_ROOT_PASSWORD: 1503
-      MYSQL_DATABASE: test_capstone
+      MYSQL_DATABASE: capstone_main
     ports:
       - "3308:3306"
     volumes:

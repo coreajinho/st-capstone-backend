@@ -1,19 +1,17 @@
 package org.example.stcapstonebackend.debate.dto;
 
 import lombok.Builder;
+import org.example.stcapstonebackend.debate.model.DebateSide;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
-public record DebatePostResponse(
+public record DebateCommentResponse(
         Long id,
-        String title,
         String content,
         String writer,
-        String coWriter,
+        DebateSide debateSide,
         LocalDateTime createdAt,
-        LocalDateTime modifiedAt,
-        List<DebateCommentResponse> comments
+        LocalDateTime modifiedAt
 ) {
 }

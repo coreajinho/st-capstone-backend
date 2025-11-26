@@ -1,6 +1,10 @@
 package org.example.stcapstonebackend.common.advice;
 
+import org.example.stcapstonebackend.common.exception.CommentNotFoundException;
 import org.example.stcapstonebackend.debate.exception.DebatePostNotFoundException;
+import org.example.stcapstonebackend.user.exception.DuplicateEmailException;
+import org.example.stcapstonebackend.user.exception.InvalidCredentialsException;
+import org.example.stcapstonebackend.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +31,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DebatePostNotFoundException.class)
     public ResponseEntity<String> handlePostNotFoundException(DebatePostNotFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<String> handleCommentNotFoundException(CommentNotFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<String> handleDuplicateEmailException(DuplicateEmailException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<String> handleInvalidCredentialsException(InvalidCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
