@@ -20,6 +20,7 @@ public class DebatePostMapper {
                 .content(request.content())
                 .writer(request.writer())
                 .coWriter(request.coWriter())
+                .tags(request.tags())
                 .build();
     }
 
@@ -30,6 +31,9 @@ public class DebatePostMapper {
                 post.getContent(),
                 post.getWriter(),
                 post.getCoWriter(),
+                post.getViews(),
+                post.getComments().size(),
+                post.getTags(),
                 post.getCreatedAt(),
                 post.getModifiedAt(),
                 post.getComments().stream()

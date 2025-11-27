@@ -28,9 +28,11 @@ public class DebateComment extends BaseEntity{
     @Column(nullable = false)
     private DebateSide debateSide;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer likes = 0;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer dislikes = 0;
 
@@ -46,4 +48,27 @@ public class DebateComment extends BaseEntity{
         this.content = content;
         this.writer = writer;
     }
+
+    // TODO: 좋아요/싫어요 기능 - 나중에 구현 예정
+    /*
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void decrementLikes() {
+        if (this.likes > 0) {
+            this.likes--;
+        }
+    }
+
+    public void incrementDislikes() {
+        this.dislikes++;
+    }
+
+    public void decrementDislikes() {
+        if (this.dislikes > 0) {
+            this.dislikes--;
+        }
+    }
+    */
 }

@@ -72,4 +72,63 @@ public class DebateCommentService {
         // 3. 검증이 통과된 경우에만 안전하게 삭제합니다.
         debateCommentRepository.delete(comment);
     }
+
+    // TODO: 좋아요/싫어요 기능 - 나중에 구현 예정
+    /*
+    // 좋아요 토글 (증가/감소)
+    public DebateCommentResponse toggleLike(Long postId, Long commentId) {
+        DebateComment comment = debateCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!comment.getDebatePost().getId().equals(postId)) {
+            throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
+        }
+
+        comment.incrementLikes();
+        DebateComment savedComment = debateCommentRepository.save(comment);
+        return debateCommentMapper.toDto(savedComment);
+    }
+
+    // 좋아요 취소 (감소)
+    public DebateCommentResponse cancelLike(Long postId, Long commentId) {
+        DebateComment comment = debateCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!comment.getDebatePost().getId().equals(postId)) {
+            throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
+        }
+
+        comment.decrementLikes();
+        DebateComment savedComment = debateCommentRepository.save(comment);
+        return debateCommentMapper.toDto(savedComment);
+    }
+
+    // 싫어요 토글 (증가/감소)
+    public DebateCommentResponse toggleDislike(Long postId, Long commentId) {
+        DebateComment comment = debateCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!comment.getDebatePost().getId().equals(postId)) {
+            throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
+        }
+
+        comment.incrementDislikes();
+        DebateComment savedComment = debateCommentRepository.save(comment);
+        return debateCommentMapper.toDto(savedComment);
+    }
+
+    // 싫어요 취소 (감소)
+    public DebateCommentResponse cancelDislike(Long postId, Long commentId) {
+        DebateComment comment = debateCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!comment.getDebatePost().getId().equals(postId)) {
+            throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
+        }
+
+        comment.decrementDislikes();
+        DebateComment savedComment = debateCommentRepository.save(comment);
+        return debateCommentMapper.toDto(savedComment);
+    }
+    */
 }

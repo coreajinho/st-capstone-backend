@@ -11,6 +11,8 @@ public record DebateCommentResponse(
         String content,
         String writer,
         DebateSide debateSide,
+        Integer likes,
+        Integer dislikes,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {

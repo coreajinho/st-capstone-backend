@@ -7,7 +7,6 @@ import org.example.stcapstonebackend.debate.model.DebateSide;
 public record DebateCommentRequest(
         @NotBlank String content,
         @NotBlank String writer,
-        @NotNull DebateSide debateSide,
-        @NotNull Long debatePostId
+        @NotNull DebateSide debateSide
 ) {
 }

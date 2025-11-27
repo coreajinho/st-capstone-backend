@@ -43,4 +43,47 @@ public class DebateCommentController {
         debateCommentService.deleteComment(postId, commentId);
         return ResponseEntity.noContent().build();
     }
+
+    // TODO: 좋아요/싫어요 기능 - 나중에 구현 예정
+    /*
+    // 댓글 좋아요 추가
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<DebateCommentResponse> likeComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId
+    ) {
+        DebateCommentResponse response = debateCommentService.toggleLike(postId, commentId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 댓글 좋아요 취소
+    @DeleteMapping("/{commentId}/like")
+    public ResponseEntity<DebateCommentResponse> cancelLikeComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId
+    ) {
+        DebateCommentResponse response = debateCommentService.cancelLike(postId, commentId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 댓글 싫어요 추가
+    @PostMapping("/{commentId}/dislike")
+    public ResponseEntity<DebateCommentResponse> dislikeComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId
+    ) {
+        DebateCommentResponse response = debateCommentService.toggleDislike(postId, commentId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 댓글 싫어요 취소
+    @DeleteMapping("/{commentId}/dislike")
+    public ResponseEntity<DebateCommentResponse> cancelDislikeComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId
+    ) {
+        DebateCommentResponse response = debateCommentService.cancelDislike(postId, commentId);
+        return ResponseEntity.ok(response);
+    }
+    */
 }

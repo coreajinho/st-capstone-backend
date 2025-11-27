@@ -13,6 +13,8 @@ public class DebateCommentMapper {
                 debateComment.getContent(),
                 debateComment.getWriter(),
                 debateComment.getDebateSide(),
+                debateComment.getLikes(),
+                debateComment.getDislikes(),
                 debateComment.getCreatedAt(),
                 debateComment.getModifiedAt()
         );
