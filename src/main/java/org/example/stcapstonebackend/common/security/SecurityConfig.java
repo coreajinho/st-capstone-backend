@@ -1,6 +1,7 @@
 package org.example.stcapstonebackend.common.security;
 
-import lombok.RequiredArgsConstructor;
+// TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+// import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,14 +14,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+// TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+// TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+// @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    // TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+    // private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -43,9 +47,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers("/summoner/**").permitAll()
                         .requestMatchers("/api/debate/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                        // TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+                        // .anyRequest().authenticated()
+                        .anyRequest().permitAll() // 임시: 모든 요청 허용
+                );
+                // TODO: 로그인 기능 구현 완료 후 주석 해제 필요
+                // .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
