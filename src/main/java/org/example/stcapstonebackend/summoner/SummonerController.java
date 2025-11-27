@@ -3,6 +3,7 @@ package org.example.stcapstonebackend.summoner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.common.client.dto.MatchDto;
+import org.example.stcapstonebackend.summoner.dto.MatchListResponseDto;
 import org.example.stcapstonebackend.summoner.dto.SummonerSearchResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,17 @@ public class SummonerController {
         MatchDto match = summonerService.getMatch(matchIdsBlock.get(0)).block();
         return ResponseEntity.status(HttpStatus.OK)
             .body(match);
+    }
+
+    // puuid와 페이징 정보를 받아서 최근 매치 리스트를 반환 (병렬 처리)
+    // start: 가져올 시작 인덱스 (기본 0), count: 가져올 매치 개수 (기본 10개)
+    @GetMapping("/matches")
+    public ResponseEntity<MatchListResponseDto> getRecentMatches(
+            @RequestParam String puuid,
+            @RequestParam(defaultValue = "0") int start,
+            @RequestParam(defaultValue = "10") int count) {
+        MatchListResponseDto response = summonerService.getRecentMatches(puuid, start, count);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
     }
 }

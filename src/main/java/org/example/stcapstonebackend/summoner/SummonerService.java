@@ -6,6 +6,7 @@ import org.example.stcapstonebackend.common.client.RiotApiClient;
 import org.example.stcapstonebackend.common.client.dto.LeagueEntryDto;
 import org.example.stcapstonebackend.common.client.dto.MatchDto;
 import org.example.stcapstonebackend.common.client.dto.RiotAccountDto;
+import org.example.stcapstonebackend.summoner.dto.MatchListResponseDto;
 import org.example.stcapstonebackend.summoner.dto.SummonerSearchResponseDto;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -46,7 +47,49 @@ public class SummonerService {
         return riotApiClient.fetchMatchByMatchId(matchId);
     }
 
-//    public Flux<>
+    // puuid와 페이지 정보로 최근 매치 리스트를 병렬로 가져오는 메서드
+    // start: 가져올 시작 인덱스, count: 가져올 매치 개수 (기본 10개)
+    public MatchListResponseDto getRecentMatches(String puuid, int start, int count) {
+        // 1. 전체 매치 ID 리스트 조회 (최대 100개 정도 충분히 많이 가져오기)
+        List<String> allMatchIds = riotApiClient.fetchMatchIdsByPuuid(puuid, 100)
+                .block();
+
+        if (allMatchIds == null || allMatchIds.isEmpty()) {
+            return MatchListResponseDto.builder()
+                    .matches(List.of())
+                    .hasMore(false)
+                    .build();
+        }
+
+        // 2. 요청된 범위의 매치 ID만 추출
+        int endIndex = Math.min(start + count, allMatchIds.size());
+        if (start >= allMatchIds.size()) {
+            return MatchListResponseDto.builder()
+                    .matches(List.of())
+                    .hasMore(false)
+                    .build();
+        }
+
+        List<String> targetMatchIds = allMatchIds.subList(start, endIndex);
+
+        // 3. 여러 매치 정보를 병렬로 가져오기 (Flux 사용)
+        List<MatchDto> matches = Flux.fromIterable(targetMatchIds)
+                .flatMap(matchId -> riotApiClient.fetchMatchByMatchId(matchId)
+                        .onErrorResume(e -> {
+                            log.error("Failed to fetch match: {}", matchId, e);
+                            return Mono.empty(); // 실패한 경우 빈 값으로 처리
+                        }))
+                .collectList()
+                .block();
+
+        // 4. 더 가져올 매치가 있는지 확인
+        boolean hasMore = endIndex < allMatchIds.size();
+
+        return MatchListResponseDto.builder()
+                .matches(matches)
+                .hasMore(hasMore)
+                .build();
+    }
 
     // 닉네임#태그 형식의 문자열을 받아서 소환사 검색 결과(SummonerSearchResponseDto) 반환
     public SummonerSearchResponseDto searchSummoner(String fullname) {
