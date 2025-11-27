@@ -46,7 +46,7 @@ public class DebatePostService {
     public DebatePostResponse updatePost(DebatePostRequest postDto, Long id) {
         DebatePost post = getPostEntity(id);
 
-        post.update(postDto.title(), postDto.content(), postDto.writer(), postDto.coWriter(), postDto.tags());
+        post.update(postDto.title(), postDto.content(), postDto.writer(), postDto.coWriter(), postDto.videoUrl(), postDto.tags());
 
         return debatePostMapper.toDto(post);
     }

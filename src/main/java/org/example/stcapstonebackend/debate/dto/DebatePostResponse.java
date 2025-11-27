@@ -14,6 +14,7 @@ public record DebatePostResponse(
         String content,
         String writer,
         String coWriter,
+        String videoUrl,
         int views,
         int commentCount,
         Set<DebateTag> tags,

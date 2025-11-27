@@ -33,6 +33,8 @@ public class DebatePost extends BaseEntity{
     private String writer;
     private String coWriter;
 
+    private String videoUrl;
+
     @Column(nullable = false)
     private int views = 0;
 
@@ -57,11 +59,12 @@ public class DebatePost extends BaseEntity{
         this.views++;
     }
 
-    public void update(String title, String content, String writer, String coWriter, Set<DebateTag> tags) {
+    public void update(String title, String content, String writer, String coWriter, String videoUrl, Set<DebateTag> tags) {
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.coWriter = coWriter;
+        this.videoUrl = videoUrl;
         if (tags != null) {
             this.tags = tags;
         }

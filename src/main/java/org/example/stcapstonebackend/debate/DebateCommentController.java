@@ -34,6 +34,17 @@ public class DebateCommentController {
         return ResponseEntity.ok(comments);
     }
 
+    // 댓글 id로 특정 댓글 수정
+    @PutMapping("/{commentId}")
+    public ResponseEntity<DebateCommentResponse> updateComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody DebateCommentRequest request
+    ) {
+        DebateCommentResponse response = debateCommentService.updateComment(postId, commentId, request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
     // 댓글 id로 특정 댓글 삭제
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(

@@ -20,6 +20,7 @@ public class DebatePostMapper {
                 .content(request.content())
                 .writer(request.writer())
                 .coWriter(request.coWriter())
+                .videoUrl(request.videoUrl())
                 .tags(request.tags())
                 .build();
     }
@@ -31,6 +32,7 @@ public class DebatePostMapper {
                 post.getContent(),
                 post.getWriter(),
                 post.getCoWriter(),
+                post.getVideoUrl(),
                 post.getViews(),
                 post.getComments().size(),
                 post.getTags(),

@@ -32,6 +32,7 @@ public class RiotApiClient {
                 .bodyToFlux(LeagueEntryDto.class);
     }
 
+    // puuid로 매치 ID 리스트를 가져오는 메서드
     public Mono<List<String>> fetchMatchIdsByPuuid(String puuid, int count) {
         return riotAsiaWebClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -42,6 +43,7 @@ public class RiotApiClient {
                 .bodyToMono(new ParameterizedTypeReference<List<String>>() {});
     }
 
+    // 기본 count 값을 10으로 설정한 오버로드 메서드
     public Mono<List<String>> fetchMatchIdsByPuuid(String puuid) {
         return fetchMatchIdsByPuuid(puuid, 10);
     }

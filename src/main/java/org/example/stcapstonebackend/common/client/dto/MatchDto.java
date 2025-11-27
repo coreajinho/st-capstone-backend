@@ -10,6 +10,10 @@ public record MatchDto(
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static record InfoDto(
+            long gameDuration,
+            long gameEndTimestamp,
+            String gameMode, //레거시 코드(추후 업데이트 가능성을 위해 남겨둠)
+            int queueId,
             List<ParticipantDto> participants
     ) {
         @JsonIgnoreProperties(ignoreUnknown = true)
