@@ -7,7 +7,7 @@ import org.example.stcapstonebackend.user.dto.TokenResponse;
 import org.example.stcapstonebackend.user.dto.UserLoginRequest;
 import org.example.stcapstonebackend.user.dto.UserResponse;
 import org.example.stcapstonebackend.user.dto.UserSignUpRequest;
-import org.example.stcapstonebackend.user.exception.DuplicateEmailException;
+import org.example.stcapstonebackend.user.exception.DuplicateUsernameException;
 import org.example.stcapstonebackend.user.exception.InvalidCredentialsException;
 import org.example.stcapstonebackend.user.exception.UserNotFoundException;
 import org.example.stcapstonebackend.user.model.Role;
@@ -27,56 +27,59 @@ public class UserService {
 
     @Transactional
     public UserResponse signUp(UserSignUpRequest request) {
-        // 이메일 중복 체크
-        if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateEmailException("이미 사용 중인 이메일입니다: " + request.email());
+        // 아이디 중복 체크
+        if (userRepository.existsByUsername(request.username())) {
+            throw new DuplicateUsernameException("이미 사용 중인 아이디입니다: " + request.username());
         }
 
         // 사용자 생성
         User user = User.builder()
-                .email(request.email())
+                .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
-                .nickname(request.nickname())
+                .riotName(request.riotName())
+                .riotTag(request.riotTag())
                 .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(user);
-        log.info("New user registered: {}", savedUser.getEmail());
+        log.info("New user registered: {} (Riot: {}#{})", savedUser.getUsername(), savedUser.getRiotName(), savedUser.getRiotTag());
 
         return new UserResponse(
                 savedUser.getId(),
-                savedUser.getEmail(),
-                savedUser.getNickname(),
+                savedUser.getUsername(),
+                savedUser.getRiotName(),
+                savedUser.getRiotTag(),
                 savedUser.getRole()
         );
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(UserLoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + request.email()));
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + request.username()));
 
         // 비밀번호 검증
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new InvalidCredentialsException("이메일 또는 비밀번호가 일치하지 않습니다");
+            throw new InvalidCredentialsException("아이디 또는 비밀번호가 일치하지 않습니다");
         }
 
         // JWT 토큰 생성
-        String token = jwtTokenProvider.createToken(user.getEmail(), user.getRole().name());
-        log.info("User logged in: {}", user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole().name());
+        log.info("User logged in: {}", user.getUsername());
 
         return new TokenResponse(token, jwtTokenProvider.getValidityInMilliseconds() / 1000);
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + email));
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
         return new UserResponse(
                 user.getId(),
-                user.getEmail(),
-                user.getNickname(),
+                user.getUsername(),
+                user.getRiotName(),
+                user.getRiotTag(),
                 user.getRole()
         );
     }

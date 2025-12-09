@@ -4,8 +4,9 @@ import org.example.stcapstonebackend.user.model.Role;
 
 public record UserResponse(
         Long id,
-        String email,
-        String nickname,
+        String username,
+        String riotName,
+        String riotTag,
         Role role
 ) {
 }

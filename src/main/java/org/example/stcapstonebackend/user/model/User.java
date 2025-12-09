@@ -17,14 +17,18 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
     @Column(nullable = false)
     private String password;
 
+
     @Column(nullable = false, length = 50)
-    private String nickname;
+    private String riotName;
+
+    @Column(nullable = false, length = 10)
+    private String riotTag;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
