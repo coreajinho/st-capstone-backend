@@ -2,6 +2,10 @@ package org.example.stcapstonebackend.common.advice;
 
 import org.example.stcapstonebackend.common.exception.CommentNotFoundException;
 import org.example.stcapstonebackend.debate.exception.DebatePostNotFoundException;
+import org.example.stcapstonebackend.findTeam.exception.DuplicateAcceptanceException;
+import org.example.stcapstonebackend.findTeam.exception.FindTeamPostNotFoundException;
+import org.example.stcapstonebackend.findTeam.exception.FindTeamRequestNotFoundException;
+import org.example.stcapstonebackend.findTeam.exception.InvalidTagSelectionException;
 import org.example.stcapstonebackend.user.exception.DuplicateEmailException;
 import org.example.stcapstonebackend.user.exception.InvalidCredentialsException;
 import org.example.stcapstonebackend.user.exception.UserNotFoundException;
@@ -56,6 +60,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(FindTeamPostNotFoundException.class)
+    public ResponseEntity<String> handleFindTeamPostNotFoundException(FindTeamPostNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(FindTeamRequestNotFoundException.class)
+    public ResponseEntity<String> handleFindTeamRequestNotFoundException(FindTeamRequestNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTagSelectionException.class)
+    public ResponseEntity<String> handleInvalidTagSelectionException(InvalidTagSelectionException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateAcceptanceException.class)
+    public ResponseEntity<String> handleDuplicateAcceptanceException(DuplicateAcceptanceException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(e.getMessage());
     }
 }

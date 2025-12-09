@@ -1,7 +1,7 @@
 package org.example.stcapstonebackend.debate.dto;
 
 import lombok.Builder;
-import org.example.stcapstonebackend.debate.model.DebateTag;
+import org.example.stcapstonebackend.common.model.PositionTag;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +17,7 @@ public record DebatePostResponse(
         String videoUrl,
         int views,
         int commentCount,
-        Set<DebateTag> tags,
+        Set<PositionTag> tags,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
         List<DebateCommentResponse> comments

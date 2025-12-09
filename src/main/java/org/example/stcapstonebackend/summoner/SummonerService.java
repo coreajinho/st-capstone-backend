@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,13 +73,19 @@ public class SummonerService {
 
         List<String> targetMatchIds = allMatchIds.subList(start, endIndex);
 
-        // 3. 여러 매치 정보를 병렬로 가져오기 (Flux 사용)
+        // 3. 여러 매치 정보를 병렬로 가져오기 (Rate Limit 고려하여 병렬성 제한)
         List<MatchDto> matches = Flux.fromIterable(targetMatchIds)
-                .flatMap(matchId -> riotApiClient.fetchMatchByMatchId(matchId)
-                        .onErrorResume(e -> {
-                            log.error("Failed to fetch match: {}", matchId, e);
-                            return Mono.empty(); // 실패한 경우 빈 값으로 처리
-                        }))
+                .delayElements(Duration.ofMillis(100)) // 각 요청 사이에 100ms 딜레이 추가
+                .flatMap(matchId ->
+                        riotApiClient.fetchMatchByMatchId(matchId)
+                                .retryWhen(reactor.util.retry.Retry.backoff(3, Duration.ofMillis(200))
+                                        .maxBackoff(Duration.ofMillis(500))
+                                        .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientResponseException.TooManyRequests))
+                                .onErrorResume(e -> {
+                                    log.error("Failed to fetch match: {}", matchId, e);
+                                    return Mono.empty(); // 실패한 경우 빈 값으로 처리
+                                }),
+                        5) // 동시에 최대 5개의 요청만 처리
                 .collectList()
                 .block();
 

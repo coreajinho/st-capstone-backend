@@ -2,6 +2,7 @@ package org.example.stcapstonebackend.debate.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.stcapstonebackend.common.model.PositionTag;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public class DebatePost extends BaseEntity{
     @CollectionTable(name = "debate_post_tags", joinColumns = @JoinColumn(name = "debate_post_id"))
     @Column(name = "tag")
     @Builder.Default
-    private Set<DebateTag> tags = new HashSet<>();
+    private Set<PositionTag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "debatePost", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default // Builder 사용 시 기본값 설정
@@ -59,7 +60,7 @@ public class DebatePost extends BaseEntity{
         this.views++;
     }
 
-    public void update(String title, String content, String writer, String coWriter, String videoUrl, Set<DebateTag> tags) {
+    public void update(String title, String content, String writer, String coWriter, String videoUrl, Set<PositionTag> tags) {
         this.title = title;
         this.content = content;
         this.writer = writer;
