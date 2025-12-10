@@ -6,6 +6,7 @@ import org.example.stcapstonebackend.findTeam.dto.FindTeamPostRequest;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamPostResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class FindTeamPostController {
     private final FindTeamPostService findTeamPostService;
 
     /**
-     * 새로운 팀 찾기 게시글을 생성합니다.
+     * 새로운 findTeam 게시글을 생성합니다.
      *
      * @param request 게시글 생성 요청 데이터
      * @return 생성된 게시글 정보
@@ -34,7 +35,7 @@ public class FindTeamPostController {
     }
 
     /**
-     * 기존 게시글을 수정합니다.
+     * 기존 findTeam 게시글을 수정합니다.
      *
      * @param id 수정할 게시글의 ID
      * @param request 수정할 게시글 데이터
@@ -50,7 +51,7 @@ public class FindTeamPostController {
     }
 
     /**
-     * 게시글을 삭제합니다.
+     * findTeam 게시글을 삭제합니다.
      *
      * @param id 삭제할 게시글의 ID
      * @return 204 No Content 응답
@@ -62,7 +63,7 @@ public class FindTeamPostController {
     }
 
     /**
-     * ID로 특정 게시글을 조회합니다.
+     * ID로 특정 findTeam 게시글을 조회합니다.
      *
      * @param id 조회할 게시글의 ID
      * @return 조회된 게시글 정보
@@ -114,13 +115,12 @@ public class FindTeamPostController {
      * 로그인한 사용자가 작성한 게시글 목록을 조회합니다.
      * 생성일 기준 내림차순으로 정렬됩니다.
      *
-     * @param principal 인증된 사용자 정보
+     * @param authentication 인증된 사용자 정보
      * @return 사용자가 작성한 게시글 목록
      */
     @GetMapping("/my-posts")
-    public ResponseEntity<List<FindTeamPostResponse>> getMyPosts(
-            java.security.Principal principal) {
-        String username = principal.getName();
+    public ResponseEntity<List<FindTeamPostResponse>> getMyPosts(Authentication authentication) {
+        String username = authentication.getName();
         List<FindTeamPostResponse> responses = findTeamPostService.getMyPosts(username);
         return ResponseEntity.ok(responses);
     }

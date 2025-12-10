@@ -49,7 +49,7 @@ public class SecurityConfig {
                         // preflight 요청(OPTIONS)을 모두 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        .requestMatchers("/summoner/**").permitAll()
+                        .requestMatchers("/api/summoner/**").permitAll()
                         .requestMatchers("/api/debate/**").permitAll()
                         // 내 게시글 조회는 인증 필수
                         .requestMatchers("/api/find-team/posts/my-posts").authenticated()

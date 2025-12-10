@@ -37,6 +37,7 @@ public class DebatePost extends BaseEntity{
     private String videoUrl;
 
     @Column(nullable = false)
+    @Builder.Default
     private int views = 0;
 
     @ElementCollection(fetch = FetchType.EAGER)

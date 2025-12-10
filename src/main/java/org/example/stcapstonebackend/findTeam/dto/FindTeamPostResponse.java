@@ -16,6 +16,7 @@ import java.util.Set;
  * @param title 게시글 제목
  * @param content 게시글 내용
  * @param writer 작성자명
+ * @param writerId 작성자 ID
  * @param tags 모집하는 포지션 태그 목록
  * @param acceptedTags 수락된 태그와 요청 ID 매핑 (Key: PositionTag, Value: 요청 ID)
  * @param availableTags 아직 수락되지 않은 태그 목록
@@ -32,6 +33,7 @@ public record FindTeamPostResponse(
         String title,
         String content,
         String writer,
+        Long writerId,
         Set<PositionTag> tags,
         Map<PositionTag, Long> acceptedTags,
         Set<PositionTag> availableTags,

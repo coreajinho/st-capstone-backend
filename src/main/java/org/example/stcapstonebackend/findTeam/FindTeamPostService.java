@@ -60,7 +60,7 @@ public class FindTeamPostService {
     @Transactional
     public FindTeamPostResponse updatePost(Long id, FindTeamPostRequest request) {
         FindTeamPost post = getPostEntity(id);
-        post.update(request.title(), request.content(), request.writer(), request.tags());
+        post.update(request.title(), request.content(), request.writer(), request.writerId(), request.tags());
         return findTeamPostMapper.toDto(post);
     }
 
@@ -144,6 +144,90 @@ public class FindTeamPostService {
     @Transactional(readOnly = true)
     public List<FindTeamPostResponse> getMyPosts(String username) {
         return findTeamPostRepository.findByWriterOrderByCreatedAtDesc(username).stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 모든 게시글을 생성일 기준 내림차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getAllPostsSortedByNewest() {
+        return findTeamPostRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 모든 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getAllPostsSortedByOldest() {
+        return findTeamPostRepository.findAllByOrderByCreatedAtAsc().stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 활성 상태 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getActivePostsSortedByOldest() {
+        return findTeamPostRepository.findByStatusOrderByCreatedAtAsc(PostStatus.ACTIVE).stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 매칭 완료 상태 게시글을 생성일 기준 내림차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getMatchedPostsSortedByNewest() {
+        return findTeamPostRepository.findByStatusOrderByCreatedAtDesc(PostStatus.MATCHED).stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 매칭 완료 상태 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getMatchedPostsSortedByOldest() {
+        return findTeamPostRepository.findByStatusOrderByCreatedAtAsc(PostStatus.MATCHED).stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 만료된 게시글을 생성일 기준 내림차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getExpiredPostsSortedByNewest() {
+        return findTeamPostRepository.findByStatusOrderByCreatedAtDesc(PostStatus.EXPIRED).stream()
+                .map(findTeamPostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 만료된 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamPostResponse> getExpiredPostsSortedByOldest() {
+        return findTeamPostRepository.findByStatusOrderByCreatedAtAsc(PostStatus.EXPIRED).stream()
                 .map(findTeamPostMapper::toDto)
                 .collect(Collectors.toList());
     }

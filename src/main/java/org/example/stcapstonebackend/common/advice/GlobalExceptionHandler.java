@@ -6,6 +6,8 @@ import org.example.stcapstonebackend.findTeam.exception.DuplicateAcceptanceExcep
 import org.example.stcapstonebackend.findTeam.exception.FindTeamPostNotFoundException;
 import org.example.stcapstonebackend.findTeam.exception.FindTeamRequestNotFoundException;
 import org.example.stcapstonebackend.findTeam.exception.InvalidTagSelectionException;
+import org.example.stcapstonebackend.review.exception.DuplicateReviewException;
+import org.example.stcapstonebackend.review.exception.ReviewNotFoundException;
 import org.example.stcapstonebackend.user.exception.DuplicateEmailException;
 import org.example.stcapstonebackend.user.exception.InvalidCredentialsException;
 import org.example.stcapstonebackend.user.exception.UserNotFoundException;
@@ -84,6 +86,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateAcceptanceException.class)
     public ResponseEntity<String> handleDuplicateAcceptanceException(DuplicateAcceptanceException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ResponseEntity<String> handleDuplicateReviewException(DuplicateReviewException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<String> handleReviewNotFoundException(ReviewNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
 }

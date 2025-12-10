@@ -2,6 +2,7 @@ package org.example.stcapstonebackend.findTeam.dto;
 
 import lombok.Builder;
 import org.example.stcapstonebackend.common.model.PositionTag;
+import org.example.stcapstonebackend.findTeam.model.PostStatus;
 
 import java.time.LocalDateTime;
 
@@ -11,8 +12,10 @@ import java.time.LocalDateTime;
  * @param id 신청 요청 ID
  * @param content 신청 내용
  * @param writer 신청자명
+ * @param writerId 신청자 ID
  * @param desiredTag 희망하는 포지션 태그
  * @param isAccepted 수락 여부
+ * @param postStatus 연관된 게시글의 상태
  * @param createdAt 생성 일시
  * @param modifiedAt 수정 일시
  */
@@ -21,8 +24,10 @@ public record FindTeamRequestResponse(
         Long id,
         String content,
         String writer,
+        Long writerId,
         PositionTag desiredTag,
         Boolean isAccepted,
+        PostStatus postStatus,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {

@@ -6,6 +6,7 @@ import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestRequest;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,6 @@ import java.util.List;
  * 신청 요청의 생성, 조회, 수정, 삭제 및 수락/취소 기능을 제공합니다.
  */
 @RestController
-@RequestMapping("/api/find-team/posts/{postId}/requests")
 @RequiredArgsConstructor
 public class FindTeamRequestController {
 
@@ -28,7 +28,7 @@ public class FindTeamRequestController {
      * @param request 신청 요청 데이터
      * @return 생성된 신청 요청 정보
      */
-    @PostMapping
+    @PostMapping("/api/find-team/posts/{postId}/requests")
     public ResponseEntity<FindTeamRequestResponse> createRequest(
             @PathVariable Long postId,
             @Valid @RequestBody FindTeamRequestRequest request
@@ -43,7 +43,7 @@ public class FindTeamRequestController {
      * @param postId 게시글 ID
      * @return 신청 요청 목록
      */
-    @GetMapping
+    @GetMapping("/api/find-team/posts/{postId}/requests")
     public ResponseEntity<List<FindTeamRequestResponse>> getRequestsByPostId(@PathVariable Long postId) {
         List<FindTeamRequestResponse> responses = findTeamRequestService.getRequestsByPostId(postId);
         return ResponseEntity.ok(responses);
@@ -57,7 +57,7 @@ public class FindTeamRequestController {
      * @param request 수정할 신청 요청 데이터
      * @return 수정된 신청 요청 정보
      */
-    @PutMapping("/{requestId}")
+    @PutMapping("/api/find-team/posts/{postId}/requests/{requestId}")
     public ResponseEntity<FindTeamRequestResponse> updateRequest(
             @PathVariable Long postId,
             @PathVariable Long requestId,
@@ -74,7 +74,7 @@ public class FindTeamRequestController {
      * @param requestId 삭제할 신청 요청 ID
      * @return 204 No Content 응답
      */
-    @DeleteMapping("/{requestId}")
+    @DeleteMapping("/api/find-team/posts/{postId}/requests/{requestId}")
     public ResponseEntity<Void> deleteRequest(
             @PathVariable Long postId,
             @PathVariable Long requestId
@@ -91,12 +91,54 @@ public class FindTeamRequestController {
      * @param requestId 수락/취소할 신청 요청 ID
      * @return 변경된 신청 요청 정보
      */
-    @PostMapping("/{requestId}/toggle-accept")
+    @PostMapping("/api/find-team/posts/{postId}/requests/{requestId}/toggle-accept")
     public ResponseEntity<FindTeamRequestResponse> toggleAcceptance(
             @PathVariable Long postId,
             @PathVariable Long requestId
     ) {
         FindTeamRequestResponse response = findTeamRequestService.toggleAcceptance(postId, requestId);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 모든 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param authentication 인증된 사용자 정보
+     * @return 사용자가 작성한 신청 요청 목록
+     */
+    @GetMapping("/api/find-team/requests/my-requests")
+    public ResponseEntity<List<FindTeamRequestResponse>> getMyRequests(Authentication authentication) {
+        String username = authentication.getName();
+        List<FindTeamRequestResponse> responses = findTeamRequestService.getMyRequests(username);
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 수락된 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param authentication 인증된 사용자 정보
+     * @return 사용자가 작성한 수락된 신청 요청 목록
+     */
+    @GetMapping("/api/find-team/requests/my-requests/accepted")
+    public ResponseEntity<List<FindTeamRequestResponse>> getMyAcceptedRequests(Authentication authentication) {
+        String username = authentication.getName();
+        List<FindTeamRequestResponse> responses = findTeamRequestService.getMyAcceptedRequests(username);
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 수락되지 않은 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param authentication 인증된 사용자 정보
+     * @return 사용자가 작성한 수락되지 않은 신청 요청 목록
+     */
+    @GetMapping("/api/find-team/requests/my-requests/pending")
+    public ResponseEntity<List<FindTeamRequestResponse>> getMyPendingRequests(Authentication authentication) {
+        String username = authentication.getName();
+        List<FindTeamRequestResponse> responses = findTeamRequestService.getMyPendingRequests(username);
+        return ResponseEntity.ok(responses);
     }
 }

@@ -15,7 +15,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ToString(exclude = "FindTeamPost")
+@ToString(exclude = "findTeamPost")
 @Entity(name="find_team_request")
 @Builder(toBuilder = true)
 public class FindTeamRequest extends BaseEntity {
@@ -38,6 +38,12 @@ public class FindTeamRequest extends BaseEntity {
      */
     @Column(nullable = false)
     private String writer;
+
+    /**
+     * 신청자 ID
+     */
+    @Column(nullable = false)
+    private Long writerId;
 
     /**
      * 희망하는 포지션 태그
@@ -74,11 +80,13 @@ public class FindTeamRequest extends BaseEntity {
      *
      * @param content 새 신청 내용
      * @param writer 새 신청자명
+     * @param writerId 새 신청자 ID
      * @param desiredTag 새 희망 포지션 태그
      */
-    public void update(String content, String writer, PositionTag desiredTag) {
+    public void update(String content, String writer, Long writerId, PositionTag desiredTag) {
         this.content = content;
         this.writer = writer;
+        this.writerId = writerId;
         this.desiredTag = desiredTag;
     }
 

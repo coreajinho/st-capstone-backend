@@ -49,6 +49,12 @@ public class FindTeamPost extends BaseEntity {
     private String writer;
 
     /**
+     * 작성자 ID
+     */
+    @Column(nullable = false)
+    private Long writerId;
+
+    /**
      * 게시글 상태 (ACTIVE, PENDING, MATCHED, EXPIRED)
      */
     @Enumerated(EnumType.STRING)
@@ -107,12 +113,14 @@ public class FindTeamPost extends BaseEntity {
      * @param title 새 제목
      * @param content 새 내용
      * @param writer 새 작성자명
+     * @param writerId 새 작성자 ID
      * @param tags 새 태그 목록 (null이 아닌 경우만 업데이트)
      */
-    public void update(String title, String content, String writer, Set<PositionTag> tags) {
+    public void update(String title, String content, String writer, Long writerId, Set<PositionTag> tags) {
         this.title = title;
         this.content = content;
         this.writer = writer;
+        this.writerId = writerId;
         if (tags != null) {
             this.tags = tags;
         }

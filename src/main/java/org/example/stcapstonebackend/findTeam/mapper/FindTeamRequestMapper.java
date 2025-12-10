@@ -21,8 +21,10 @@ public class FindTeamRequestMapper {
                 request.getId(),
                 request.getContent(),
                 request.getWriter(),
+                request.getWriterId(),
                 request.getDesiredTag(),
                 request.getIsAccepted(),
+                request.getFindTeamPost().getStatus(),
                 request.getCreatedAt(),
                 request.getModifiedAt()
         );

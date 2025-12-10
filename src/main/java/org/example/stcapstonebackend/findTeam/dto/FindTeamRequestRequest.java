@@ -10,12 +10,14 @@ import org.example.stcapstonebackend.common.model.PositionTag;
  *
  * @param content 신청 내용
  * @param writer 신청자명
+ * @param writerId 신청자 ID
  * @param desiredTag 희망하는 포지션 태그
  */
 @Builder
 public record FindTeamRequestRequest(
         @NotBlank String content,
         @NotBlank String writer,
+        @NotNull Long writerId,
         @NotNull PositionTag desiredTag
 ) {
 }

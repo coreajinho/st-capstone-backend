@@ -53,6 +53,7 @@ public class FindTeamRequestService {
         FindTeamRequest findTeamRequest = FindTeamRequest.builder()
                 .content(request.content())
                 .writer(request.writer())
+                .writerId(request.writerId())
                 .desiredTag(request.desiredTag())
                 .build();
 
@@ -111,7 +112,7 @@ public class FindTeamRequestService {
             throw new InvalidTagSelectionException("This tag is already accepted");
         }
 
-        findTeamRequest.update(request.content(), request.writer(), request.desiredTag());
+        findTeamRequest.update(request.content(), request.writer(), request.writerId(), request.desiredTag());
 
         return findTeamRequestMapper.toDto(findTeamRequest);
     }
@@ -170,5 +171,47 @@ public class FindTeamRequestService {
         }
 
         return findTeamRequestMapper.toDto(request);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 모든 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param username 사용자명 (로그인한 사용자)
+     * @return 사용자가 작성한 신청 요청 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamRequestResponse> getMyRequests(String username) {
+        return findTeamRequestRepository.findByWriterOrderByCreatedAtDesc(username).stream()
+                .map(findTeamRequestMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 수락된 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param username 사용자명 (로그인한 사용자)
+     * @return 사용자가 작성한 수락된 신청 요청 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamRequestResponse> getMyAcceptedRequests(String username) {
+        return findTeamRequestRepository.findByWriterAndIsAcceptedOrderByCreatedAtDesc(username, true).stream()
+                .map(findTeamRequestMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 수락되지 않은 신청 요청을 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param username 사용자명 (로그인한 사용자)
+     * @return 사용자가 작성한 수락되지 않은 신청 요청 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FindTeamRequestResponse> getMyPendingRequests(String username) {
+        return findTeamRequestRepository.findByWriterAndIsAcceptedOrderByCreatedAtDesc(username, false).stream()
+                .map(findTeamRequestMapper::toDto)
+                .toList();
     }
 }

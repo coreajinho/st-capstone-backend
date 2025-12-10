@@ -3,6 +3,8 @@ package org.example.stcapstonebackend.summoner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.common.client.dto.MatchDto;
+import org.example.stcapstonebackend.review.ReviewService;
+import org.example.stcapstonebackend.review.dto.ReviewPageResponse;
 import org.example.stcapstonebackend.summoner.dto.MatchListResponseDto;
 import org.example.stcapstonebackend.summoner.dto.SummonerSearchResponseDto;
 import org.springframework.http.HttpStatus;
@@ -16,10 +18,11 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/summoner")
+@RequestMapping("/api/summoner")
 @RequiredArgsConstructor
 public class SummonerController {
     private final SummonerService summonerService;
+    private final ReviewService reviewService;
 
     // 닉네임#태그 형식의 문자열을 받아서 소환사 검색 결과(SummonerSearchResponseDto) 반환
     @GetMapping("/account")
@@ -47,6 +50,24 @@ public class SummonerController {
             @RequestParam(defaultValue = "0") int start,
             @RequestParam(defaultValue = "10") int count) {
         MatchListResponseDto response = summonerService.getRecentMatches(puuid, start, count);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    /**
+     * Riot 계정으로 사용자의 리뷰 목록 및 통계 조회
+     *
+     * @param gameName Riot 게임 이름
+     * @param tagLine Riot 태그
+     * @param page 페이지 번호 (기본 0)
+     * @return 리뷰 목록 + 통계 응답
+     */
+    @GetMapping("/reviews")
+    public ResponseEntity<ReviewPageResponse> getReviews(
+            @RequestParam String gameName,
+            @RequestParam String tagLine,
+            @RequestParam(defaultValue = "0") int page) {
+        ReviewPageResponse response = reviewService.getReviewsByRiotAccount(gameName, tagLine, page);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }

@@ -85,5 +85,27 @@ public interface FindTeamPostRepository extends JpaRepository<FindTeamPost, Long
      * @return 정렬된 게시글 목록
      */
     List<FindTeamPost> findByWriterOrderByCreatedAtDesc(String writer);
+
+    /**
+     * 모든 게시글을 생성일 기준 내림차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    List<FindTeamPost> findAllByOrderByCreatedAtDesc();
+
+    /**
+     * 특정 상태의 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @param status 조회할 게시글 상태
+     * @return 정렬된 게시글 목록
+     */
+    List<FindTeamPost> findByStatusOrderByCreatedAtAsc(PostStatus status);
+
+    /**
+     * 모든 게시글을 생성일 기준 오름차순으로 조회합니다.
+     *
+     * @return 정렬된 게시글 목록
+     */
+    List<FindTeamPost> findAllByOrderByCreatedAtAsc();
 }
 

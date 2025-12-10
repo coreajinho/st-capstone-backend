@@ -28,6 +28,7 @@ public class FindTeamPostMapper {
                 .title(request.title())
                 .content(request.content())
                 .writer(request.writer())
+                .writerId(request.writerId())
                 .tags(request.tags())
                 .build();
     }
@@ -44,6 +45,7 @@ public class FindTeamPostMapper {
                 post.getTitle(),
                 post.getContent(),
                 post.getWriter(),
+                post.getWriterId(),
                 post.getTags(),
                 post.getAcceptedTags(),
                 post.getAvailableTags(),

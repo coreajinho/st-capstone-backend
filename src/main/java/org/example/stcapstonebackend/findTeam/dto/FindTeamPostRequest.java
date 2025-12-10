@@ -2,6 +2,7 @@ package org.example.stcapstonebackend.findTeam.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.example.stcapstonebackend.common.model.PositionTag;
@@ -14,6 +15,7 @@ import java.util.Set;
  * @param title 게시글 제목 (1-100자)
  * @param content 게시글 내용 (1자 이상)
  * @param writer 작성자명 (2-15자)
+ * @param writerId 작성자 ID
  * @param tags 모집하는 포지션 태그 목록 (최소 1개 이상)
  */
 @Builder
@@ -21,6 +23,7 @@ public record FindTeamPostRequest(
         @Size(min = 1, max = 100) @NotBlank String title,
         @Size(min = 1) @NotBlank String content,
         @Size(min = 2, max = 15) @NotBlank String writer,
+        @NotNull Long writerId,
         @NotEmpty Set<PositionTag> tags
 ) {
 }
