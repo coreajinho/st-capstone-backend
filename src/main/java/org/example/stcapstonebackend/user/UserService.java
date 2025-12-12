@@ -3,6 +3,7 @@ package org.example.stcapstonebackend.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.stcapstonebackend.common.security.JwtTokenProvider;
+import org.example.stcapstonebackend.user.dto.CoWriterValidationResponse;
 import org.example.stcapstonebackend.user.dto.TokenResponse;
 import org.example.stcapstonebackend.user.dto.UserLoginRequest;
 import org.example.stcapstonebackend.user.dto.UserResponse;
@@ -82,6 +83,29 @@ public class UserService {
                 user.getRiotTag(),
                 user.getRole()
         );
+    }
+
+    /**
+     * CoWriter 검증을 수행합니다.
+     * riotName과 riotTag로 회원가입된 사용자인지 확인합니다.
+     *
+     * @param riotName 라이엇 게임 닉네임
+     * @param riotTag 라이엇 태그
+     * @return CoWriter 검증 응답 (회원 여부, 사용자 ID, 표시 이름)
+     */
+    @Transactional(readOnly = true)
+    public CoWriterValidationResponse validateCoWriter(String riotName, String riotTag) {
+        return userRepository.findByRiotNameAndRiotTag(riotName, riotTag)
+                .map(user -> CoWriterValidationResponse.builder()
+                        .isValid(true)
+                        .userId(user.getId())
+                        .displayName(user.getRiotName() + "#" + user.getRiotTag())
+                        .build())
+                .orElseGet(() -> CoWriterValidationResponse.builder()
+                        .isValid(false)
+                        .userId(null)
+                        .displayName(null)
+                        .build());
     }
 }
 

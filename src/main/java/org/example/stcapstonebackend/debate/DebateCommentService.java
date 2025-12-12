@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.debate.dto.DebateCommentRequest;
 import org.example.stcapstonebackend.debate.dto.DebateCommentResponse;
 import org.example.stcapstonebackend.common.exception.CommentNotFoundException;
+import org.example.stcapstonebackend.debate.dto.DebateCommentWithPostInfoResponse;
 import org.example.stcapstonebackend.debate.exception.DebatePostNotFoundException;
 import org.example.stcapstonebackend.debate.mapper.DebateCommentMapper;
 import org.example.stcapstonebackend.debate.model.DebateComment;
@@ -28,12 +29,8 @@ public class DebateCommentService {
         DebatePost post = debatePostRepository.findById(postId)
                 .orElseThrow(() -> new DebatePostNotFoundException("해당 ID의 게시글을 찾을 수 없습니다."));
 
-        // 2. 댓글 객체(아직 Entity 아님) 생성
-        DebateComment comment = DebateComment.builder()
-                .content(request.content())
-                .writer(request.writer())
-                .debateSide(request.debateSide())
-                .build();
+        // 2. 댓글 객체 생성 (mapper를 통해 writer 자동 생성)
+        DebateComment comment = debateCommentMapper.toEntity(request);
 
         // 3. 연관관계 설정
         post.addComment(comment);
@@ -70,7 +67,9 @@ public class DebateCommentService {
         }
 
         // 3. 검증이 통과된 경우에만 안전하게 수정합니다.
-        comment.update(request.content(), request.writer());
+        // writerId 유효성 검증 (toEntity에서 수행)
+        debateCommentMapper.toEntity(request);
+        comment.update(request.content(), request.writerId());
 
         return debateCommentMapper.toDto(comment);
     }
@@ -89,6 +88,21 @@ public class DebateCommentService {
 
         // 3. 검증이 통과된 경우에만 안전하게 삭제합니다.
         debateCommentRepository.delete(comment);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 댓글(투표) 목록을 조회합니다.
+     * 게시글 정보를 함께 반환하여 프론트엔드에서 투표한 플레이어 이름을 표시할 수 있습니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param userId 사용자 ID
+     * @return 게시글 정보가 포함된 사용자가 작성한 댓글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<DebateCommentWithPostInfoResponse> getMyVotes(Long userId) {
+        return debateCommentRepository.findByWriterIdWithPostOrderByCreatedAtDesc(userId).stream()
+                .map(debateCommentMapper::toDetailedDto)
+                .toList();
     }
 
     // TODO: 좋아요/싫어요 기능 - 나중에 구현 예정

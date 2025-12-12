@@ -32,7 +32,13 @@ public class DebatePost extends BaseEntity{
 
     @Column(nullable = false)
     private String writer;
+
+    @Column(nullable = false)
+    private Long writerId;
+
     private String coWriter;
+
+    private Long coWriterId;
 
     private String videoUrl;
 
@@ -61,11 +67,21 @@ public class DebatePost extends BaseEntity{
         this.views++;
     }
 
-    public void update(String title, String content, String writer, String coWriter, String videoUrl, Set<PositionTag> tags) {
+    /**
+     * 게시글 정보를 업데이트합니다.
+     *
+     * @param title 제목
+     * @param content 내용
+     * @param writerId 작성자 ID
+     * @param coWriterId 공동 작성자 ID
+     * @param videoUrl 비디오 URL
+     * @param tags 포지션 태그 목록
+     */
+    public void update(String title, String content, Long writerId, Long coWriterId, String videoUrl, Set<PositionTag> tags) {
         this.title = title;
         this.content = content;
-        this.writer = writer;
-        this.coWriter = coWriter;
+        this.writerId = writerId;
+        this.coWriterId = coWriterId;
         this.videoUrl = videoUrl;
         if (tags != null) {
             this.tags = tags;

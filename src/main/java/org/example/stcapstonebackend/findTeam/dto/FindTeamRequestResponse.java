@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  * 팀 찾기 신청 요청 응답을 위한 DTO입니다.
  *
  * @param id 신청 요청 ID
+ * @param postId 연관된 게시글 ID
  * @param content 신청 내용
  * @param writer 신청자명
  * @param writerId 신청자 ID
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 @Builder
 public record FindTeamRequestResponse(
         Long id,
+        Long postId,
         String content,
         String writer,
         Long writerId,

@@ -24,6 +24,9 @@ public class DebateComment extends BaseEntity{
     @Column(nullable = false)
     private String writer;
 
+    @Column(nullable = false)
+    private Long writerId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DebateSide debateSide;
@@ -44,9 +47,15 @@ public class DebateComment extends BaseEntity{
         this.debatePost = debatePost;
     }
 
-    public void update(String content, String writer) {
+    /**
+     * 댓글 정보를 업데이트합니다.
+     *
+     * @param content 댓글 내용
+     * @param writerId 작성자 ID
+     */
+    public void update(String content, Long writerId) {
         this.content = content;
-        this.writer = writer;
+        this.writerId = writerId;
     }
 
     // TODO: 좋아요/싫어요 기능 - 나중에 구현 예정

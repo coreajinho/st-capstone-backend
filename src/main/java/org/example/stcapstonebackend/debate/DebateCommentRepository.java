@@ -31,4 +31,27 @@ public interface DebateCommentRepository extends JpaRepository<DebateComment, Lo
         DebateSide getSide();
         Long getCount();
     }
+
+    /**
+     * 작성자 ID로 댓글을 조회합니다. (내 투표 조회용)
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param writerId 작성자 ID
+     * @return 작성자가 작성한 댓글 목록
+     */
+    List<DebateComment> findByWriterIdOrderByCreatedAtDesc(Long writerId);
+
+    /**
+     * 작성자 ID로 댓글을 조회합니다. (내 투표 조회용)
+     * 게시글 정보를 함께 fetch join하여 N+1 문제를 방지합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param writerId 작성자 ID
+     * @return 작성자가 작성한 댓글 목록 (게시글 정보 포함)
+     */
+    @Query("SELECT dc FROM debate_comment dc " +
+           "JOIN FETCH dc.debatePost " +
+           "WHERE dc.writerId = :writerId " +
+           "ORDER BY dc.createdAt DESC")
+    List<DebateComment> findByWriterIdWithPostOrderByCreatedAtDesc(@Param("writerId") Long writerId);
 }

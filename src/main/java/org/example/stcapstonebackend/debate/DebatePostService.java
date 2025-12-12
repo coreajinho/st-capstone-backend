@@ -46,7 +46,17 @@ public class DebatePostService {
     public DebatePostResponse updatePost(DebatePostRequest postDto, Long id) {
         DebatePost post = getPostEntity(id);
 
-        post.update(postDto.title(), postDto.content(), postDto.writer(), postDto.coWriter(), postDto.videoUrl(), postDto.tags());
+        // writerId, coWriterId 유효성 검증 (toEntity에서 수행)
+        debatePostMapper.toEntity(postDto);
+
+        post.update(
+                postDto.title(),
+                postDto.content(),
+                postDto.writerId(),
+                postDto.coWriterId(),
+                postDto.videoUrl(),
+                postDto.tags()
+        );
 
         return debatePostMapper.toDto(post);
     }
@@ -169,6 +179,21 @@ public class DebatePostService {
         }
 
         return posts.stream()
+                .map(debatePostMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 게시글 목록을 조회합니다.
+     * 작성자 또는 공동 작성자로 등록된 게시글을 모두 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자가 작성한 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public List<DebatePostResponse> getMyPosts(Long userId) {
+        return debatePostRepository.findByWriterIdOrCoWriterIdOrderByCreatedAtDesc(userId).stream()
                 .map(debatePostMapper::toDto)
                 .collect(Collectors.toList());
     }

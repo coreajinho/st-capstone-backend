@@ -32,4 +32,14 @@ public interface DebatePostRepository extends JpaRepository<DebatePost,Long> {
     // 댓글 수 기준 상위 N개 게시글 조회
     @Query("SELECT d FROM debate_post d LEFT JOIN d.comments c GROUP BY d ORDER BY COUNT(c) DESC")
     List<DebatePost> findTopByOrderByCommentsDesc(Pageable pageable);
+
+    // 작성자 ID로 게시글 조회 (생성일 기준 내림차순)
+    List<DebatePost> findByWriterIdOrderByCreatedAtDesc(Long writerId);
+
+    // 공동 작성자 ID로 게시글 조회 (생성일 기준 내림차순)
+    List<DebatePost> findByCoWriterIdOrderByCreatedAtDesc(Long coWriterId);
+
+    // 작성자 또는 공동 작성자 ID로 게시글 조회 (내 게시글 조회용)
+    @Query("SELECT d FROM debate_post d WHERE d.writerId = :userId OR d.coWriterId = :userId ORDER BY d.createdAt DESC")
+    List<DebatePost> findByWriterIdOrCoWriterIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

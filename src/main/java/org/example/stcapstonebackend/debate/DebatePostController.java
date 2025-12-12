@@ -7,8 +7,12 @@ import org.example.stcapstonebackend.debate.dto.DebatePostResponse;
 import org.example.stcapstonebackend.debate.dto.DebateVoteResultDto;
 import org.example.stcapstonebackend.debate.model.PopularType;
 import org.example.stcapstonebackend.debate.model.SearchType;
+import org.example.stcapstonebackend.user.UserRepository;
+import org.example.stcapstonebackend.user.exception.UserNotFoundException;
+import org.example.stcapstonebackend.user.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DebatePostController {
     private final DebatePostService debatePostService;
+    private final UserRepository userRepository;
 
     //    토론 게시글 생성
     @PostMapping
@@ -92,6 +97,25 @@ public class DebatePostController {
     public ResponseEntity<List<DebatePostResponse>> getPopularPosts(
             @RequestParam PopularType popularType) {
         List<DebatePostResponse> posts = debatePostService.getPopularPosts(popularType);
+        return ResponseEntity.ok(posts);
+    }
+
+    /**
+     * 로그인한 사용자가 작성한 게시글 목록을 조회합니다.
+     * 작성자 또는 공동 작성자로 등록된 게시글을 모두 조회합니다.
+     * 생성일 기준 내림차순으로 정렬됩니다.
+     *
+     * @param authentication 인증된 사용자 정보
+     * @return 사용자가 작성한 게시글 목록
+     */
+    @GetMapping("/my-posts")
+    public ResponseEntity<List<DebatePostResponse>> getMyPosts(Authentication authentication) {
+        String username = authentication.getName();
+        // username으로 userId 조회
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        List<DebatePostResponse> posts = debatePostService.getMyPosts(user.getId());
         return ResponseEntity.ok(posts);
     }
 }

@@ -19,6 +19,7 @@ public class FindTeamRequestMapper {
     public FindTeamRequestResponse toDto(FindTeamRequest request) {
         return new FindTeamRequestResponse(
                 request.getId(),
+                request.getFindTeamPost().getId(),
                 request.getContent(),
                 request.getWriter(),
                 request.getWriterId(),
