@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.debate.dto.DebatePostRequest;
 import org.example.stcapstonebackend.debate.dto.DebatePostResponse;
 import org.example.stcapstonebackend.debate.dto.DebateVoteResultDto;
+import org.example.stcapstonebackend.debate.model.DebateStatus;
 import org.example.stcapstonebackend.debate.model.PopularType;
 import org.example.stcapstonebackend.debate.model.SearchType;
 import org.example.stcapstonebackend.user.UserRepository;
@@ -40,10 +41,26 @@ public class DebatePostController {
                 .body(responseDto);
     }
 
-    //    전체 토론 게시글 조회
+    /**
+     * 전체 토론 게시글 조회 (상태별 필터링 지원)
+     * status 파라미터가 없으면 상태 우선순위 정렬(PENDING > ACTIVE > EXPIRED)로 반환합니다.
+     *
+     * @param status 조회할 토론 상태 (선택, ACTIVE/PENDING/EXPIRED)
+     * @return 게시글 목록
+     */
     @GetMapping
-    public ResponseEntity<List<DebatePostResponse>> getAllPosts() {
-        List<DebatePostResponse> posts = debatePostService.getAllPosts();
+    public ResponseEntity<List<DebatePostResponse>> getAllPosts(
+            @RequestParam(required = false) DebateStatus status) {
+        List<DebatePostResponse> posts;
+
+        if (status != null) {
+            // 특정 상태 필터링
+            posts = debatePostService.getPostsByStatus(status);
+        } else {
+            // 상태 우선순위 정렬
+            posts = debatePostService.getAllPostsOrderedByStatus();
+        }
+
         return ResponseEntity.ok(posts);
     }
 

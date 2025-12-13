@@ -7,8 +7,11 @@ import org.example.stcapstonebackend.debate.model.DebatePost;
 import org.example.stcapstonebackend.user.UserRepository;
 import org.example.stcapstonebackend.user.exception.UserNotFoundException;
 import org.example.stcapstonebackend.user.model.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +24,13 @@ public class DebatePostMapper {
     private final DebateCommentMapper debateCommentMapper;
     private final UserRepository userRepository;
 
+    @Value("${debate.expiration-override:#{null}}")
+    private Duration expirationOverride;
+
     /**
      * 요청 DTO를 엔티티로 변환합니다.
      * writerId와 coWriterId로 User를 조회하여 writer/coWriter 필드를 riotName#riotTag 형식으로 생성합니다.
+     * 개발 프로필이 활성화된 경우 debate.expiration-override 설정을 우선 사용합니다.
      *
      * @param request 게시글 요청 DTO
      * @return 변환된 게시글 엔티티
@@ -41,6 +48,16 @@ public class DebatePostMapper {
             coWriterDisplayName = coWriter.getRiotName() + "#" + coWriter.getRiotTag();
         }
 
+        // 만료 시간 계산: 개발 프로필 오버라이드 > 요청 값
+        LocalDateTime expiresAt;
+        if (expirationOverride != null) {
+            // 개발 프로필에서 환경변수 기반 만료 시간 사용
+            expiresAt = LocalDateTime.now().plus(expirationOverride);
+        } else {
+            // 기본: 요청된 debateDurationHours 사용
+            expiresAt = LocalDateTime.now().plusHours(request.debateDurationHours());
+        }
+
         return DebatePost.builder()
                 .title(request.title())
                 .content(request.content())
@@ -50,6 +67,8 @@ public class DebatePostMapper {
                 .coWriterId(request.coWriterId())
                 .videoUrl(request.videoUrl())
                 .tags(request.tags())
+                .debateDurationHours(request.debateDurationHours())
+                .expiresAt(expiresAt)
                 .build();
     }
 
@@ -86,6 +105,10 @@ public class DebatePostMapper {
                 post.getViews(),
                 post.getComments().size(),
                 post.getTags(),
+                post.getDebateStatus(),
+                post.getDebateDurationHours(),
+                post.getExpiresAt(),
+                post.getTotalExtensionTimeHours(),
                 post.getCreatedAt(),
                 post.getModifiedAt(),
                 post.getComments().stream()

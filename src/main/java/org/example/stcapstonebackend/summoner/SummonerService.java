@@ -8,6 +8,8 @@ import org.example.stcapstonebackend.common.client.dto.MatchDto;
 import org.example.stcapstonebackend.common.client.dto.RiotAccountDto;
 import org.example.stcapstonebackend.summoner.dto.MatchListResponseDto;
 import org.example.stcapstonebackend.summoner.dto.SummonerSearchResponseDto;
+import org.example.stcapstonebackend.user.UserRepository;
+import org.example.stcapstonebackend.user.model.User;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SummonerService {
     private final RiotApiClient riotApiClient;
+    private final UserRepository userRepository;
 
     // 닉네임#테그 형식의 문자열을 받아서 계정정보(RiotAccountDto) 반환
     public RiotAccountDto getRiotAccount(String fullname) {
@@ -103,6 +106,8 @@ public class SummonerService {
         // 닉네임과 태그로 puuid, 게임 닉네임 등 기본 정보를 조회
         RiotAccountDto riotAccountResponse = getRiotAccount(fullname);
         String puuid = riotAccountResponse.puuid();
+        String gameName = riotAccountResponse.gameName();
+        String tagLine = riotAccountResponse.tagLine();
 
         // puuid로 솔로 랭크와 자유 랭크 정보를 조회
         List<LeagueEntryDto> riotLeagueEntryResponse = getLeagueEntry(puuid);
@@ -117,10 +122,33 @@ public class SummonerService {
                 .filter(entry -> "RANKED_FLEX_SR".equals(entry.queueType()))
                 .findFirst();
 
+        // User 정보 조회하여 회원가입 여부 및 토론 통계 가져오기
+        Optional<User> userOptional = userRepository.findByRiotNameAndRiotTag(gameName, tagLine);
+        boolean isRegisteredUser = userOptional.isPresent();
+
+        Integer debateWins = 0;
+        Integer debateLosses = 0;
+        Integer debateDraws = 0;
+        Integer judgementSuccesses = 0;
+        Integer judgementFailures = 0;
+
+        if (isRegisteredUser) {
+            User user = userOptional.get();
+            debateWins = user.getDebateWins();
+            debateLosses = user.getDebateLosses();
+            debateDraws = user.getDebateDraws();
+            judgementSuccesses = user.getJudgementSuccesses();
+            judgementFailures = user.getJudgementFailures();
+            log.debug("회원가입된 사용자 조회 완료 - {}#{}, 토론 통계 - 승: {}, 패: {}, 무: {}",
+                    gameName, tagLine, debateWins, debateLosses, debateDraws);
+        } else {
+            log.debug("미가입 사용자 - {}#{}, 토론 통계는 기본값(0)으로 반환", gameName, tagLine);
+        }
+
         // 조회된 모든 정보를 바탕으로 최종 응답 DTO를 생성
         return SummonerSearchResponseDto.builder()
-                .nickname(riotAccountResponse.gameName())
-                .tagline(riotAccountResponse.tagLine())
+                .nickname(gameName)
+                .tagline(tagLine)
                 .puuid(puuid)
                 // 솔로 랭크 정보가 있으면 값을 채우고, 없으면(Optional이 비어있으면) 기본값(Unranked, 0) 사용
                 .soloTier(soloRankOptional.map(LeagueEntryDto::tier).orElse("UNRANKED"))
@@ -134,6 +162,14 @@ public class SummonerService {
                 .flexPoints(flexRankOptional.map(LeagueEntryDto::leaguePoints).orElse(0))
                 .flexWins(flexRankOptional.map(LeagueEntryDto::wins).orElse(0))
                 .flexLoses(flexRankOptional.map(LeagueEntryDto::losses).orElse(0))
+                // 회원가입 여부
+                .isRegisteredUser(isRegisteredUser)
+                // 토론 통계 정보
+                .debateWins(debateWins)
+                .debateLosses(debateLosses)
+                .debateDraws(debateDraws)
+                .judgementSuccesses(judgementSuccesses)
+                .judgementFailures(judgementFailures)
                 .build();
     }
 }

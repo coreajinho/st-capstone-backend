@@ -34,5 +34,60 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer debateWins = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer debateLosses = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer debateDraws = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer judgementSuccesses = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer judgementFailures = 0;
+
+    /**
+     * 토론 승리 횟수를 1 증가시킵니다.
+     */
+    public void incrementDebateWins() {
+        this.debateWins++;
+    }
+
+    /**
+     * 토론 패배 횟수를 1 증가시킵니다.
+     */
+    public void incrementDebateLosses() {
+        this.debateLosses++;
+    }
+
+    /**
+     * 토론 무승부 횟수를 1 증가시킵니다.
+     */
+    public void incrementDebateDraws() {
+        this.debateDraws++;
+    }
+
+    /**
+     * 판결 성공 횟수를 1 증가시킵니다.
+     */
+    public void incrementJudgementSuccesses() {
+        this.judgementSuccesses++;
+    }
+
+    /**
+     * 판결 실패 횟수를 1 증가시킵니다.
+     */
+    public void incrementJudgementFailures() {
+        this.judgementFailures++;
+    }
 }
 

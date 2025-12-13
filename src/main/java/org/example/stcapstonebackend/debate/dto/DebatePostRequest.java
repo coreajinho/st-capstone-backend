@@ -18,6 +18,7 @@ import java.util.Set;
  * @param coWriterId 공동 작성자 ID (선택)
  * @param videoUrl 비디오 URL
  * @param tags 포지션 태그 목록
+ * @param debateDurationHours 토론 기간 (시간 단위, 필수)
  */
 @Builder
 public record DebatePostRequest(
@@ -26,6 +27,7 @@ public record DebatePostRequest(
         @NotNull Long writerId,
         Long coWriterId,
         String videoUrl,
-        Set<PositionTag> tags
+        Set<PositionTag> tags,
+        @NotNull Long debateDurationHours
 ) {
 }

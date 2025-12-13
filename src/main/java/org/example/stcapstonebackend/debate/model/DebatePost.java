@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.stcapstonebackend.common.model.PositionTag;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,21 @@ public class DebatePost extends BaseEntity{
     @Builder.Default
     private int views = 0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private DebateStatus debateStatus = DebateStatus.ACTIVE;
+
+    @Column(nullable = false)
+    private Long debateDurationHours;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Long totalExtensionTimeHours = 0L;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "debate_post_tags", joinColumns = @JoinColumn(name = "debate_post_id"))
@@ -86,5 +102,34 @@ public class DebatePost extends BaseEntity{
         if (tags != null) {
             this.tags = tags;
         }
+    }
+
+    /**
+     * 토론을 PENDING 상태로 전환하고 만료 시간을 연장합니다.
+     *
+     * @param extensionHours 연장할 시간 (시간 단위)
+     */
+    public void markAsPending(long extensionHours) {
+        this.debateStatus = DebateStatus.PENDING;
+        this.expiresAt = this.expiresAt.plusHours(extensionHours);
+        this.totalExtensionTimeHours += extensionHours;
+    }
+
+    /**
+     * 토론을 EXPIRED 상태로 전환합니다.
+     */
+    public void markAsExpired() {
+        this.debateStatus = DebateStatus.EXPIRED;
+    }
+
+    /**
+     * 추가 연장이 가능한지 확인합니다.
+     * 총 연장 시간이 원래 토론 기간을 초과하지 않았는지 체크합니다.
+     *
+     * @param extensionHours 연장하려는 시간 (시간 단위)
+     * @return 연장 가능 여부
+     */
+    public boolean canExtend(long extensionHours) {
+        return (this.totalExtensionTimeHours + extensionHours) <= this.debateDurationHours;
     }
 }
