@@ -47,5 +47,6 @@ replay_pid*
 .env
 .env.*
 
-#apllication.properties
+#apllication.yml/properties -dev
+src/main/resources/application-dev.yml
 src/main/resources/application-dev.properties

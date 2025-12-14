@@ -1,0 +1,45 @@
+# ==========================================
+# Development Profile Configuration
+# ==========================================
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    springframework: INFO
+    org:
+      springframework:
+        web: INFO
+      example: DEBUG
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3308/capstone_main?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=utf8
+    username: root
+    password: 1503
+    hikari:
+      maximum-pool-size: 10
+
+# CORS Configuration (Development)
+app:
+  cors:
+    allowed-origins: http://localhost:5173
+
+# Business Logic Configuration (Development Override)
+# 개발환경 짧은 시간
+debate:
+  expiration: PT5M
+  # 개발환경 짧은 시간
+  pending-extension-duration: PT5M
+
+# 스케줄러 짧은 주기
+scheduler:
+  match-check-interval: 10000
+
+# 매치 조회 후 만료 시간
+match:
+  timeout: PT10M
+
