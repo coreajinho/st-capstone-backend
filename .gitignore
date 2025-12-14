@@ -45,3 +45,7 @@ replay_pid*
 
 #환경변수 파일
 .env
+.env.*
+
+#apllication.properties
+src/main/resources/application-dev.properties
