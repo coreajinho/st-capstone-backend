@@ -66,17 +66,27 @@ public class DebatePostController {
 
     //    id로 토론 게시글 수정
     @PutMapping("/{id}")
-    public ResponseEntity<DebatePostResponse> updatePost
-            (@Valid @RequestBody DebatePostRequest postDto, @PathVariable Long id) {
-        DebatePostResponse responseDto = debatePostService.updatePost(postDto,id);
+    public ResponseEntity<DebatePostResponse> updatePost(
+            @Valid @RequestBody DebatePostRequest postDto,
+            @PathVariable Long id,
+            Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        DebatePostResponse responseDto = debatePostService.updatePost(postDto, id, user.getId());
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(responseDto);
     }
 
     //    id로 토론 게시글 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id){
-        debatePostService.deletePost(id);
+    public ResponseEntity<Void> deletePost(@PathVariable Long id, Authentication authentication){
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        debatePostService.deletePost(id, user.getId());
         return ResponseEntity.noContent().build();
     }
 

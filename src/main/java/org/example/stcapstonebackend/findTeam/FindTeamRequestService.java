@@ -1,6 +1,7 @@
 package org.example.stcapstonebackend.findTeam;
 
 import lombok.RequiredArgsConstructor;
+import org.example.stcapstonebackend.common.exception.UnauthorizedAccessException;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestRequest;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestResponse;
 import org.example.stcapstonebackend.findTeam.exception.DuplicateAcceptanceException;
@@ -84,21 +85,29 @@ public class FindTeamRequestService {
     /**
      * 기존 신청 요청을 수정합니다.
      * 신청 요청이 해당 게시글에 속해있어야 하며, 수정하려는 태그가 유효해야 합니다.
+     * 작성자만 수정할 수 있습니다.
      *
      * @param postId 게시글 ID
      * @param requestId 수정할 신청 요청 ID
      * @param request 수정할 신청 요청 정보
+     * @param userId 수정을 요청한 사용자 ID
      * @return 수정된 신청 요청 정보
      * @throws FindTeamRequestNotFoundException 신청 요청을 찾을 수 없는 경우
      * @throws IllegalArgumentException 게시글 ID가 일치하지 않는 경우
      * @throws InvalidTagSelectionException 선택한 태그가 유효하지 않거나 이미 수락된 경우
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
      */
-    public FindTeamRequestResponse updateRequest(Long postId, Long requestId, FindTeamRequestRequest request) {
+    public FindTeamRequestResponse updateRequest(Long postId, Long requestId, FindTeamRequestRequest request, Long userId) {
         FindTeamRequest findTeamRequest = findTeamRequestRepository.findById(requestId)
                 .orElseThrow(() -> new FindTeamRequestNotFoundException("Cannot find request with id: " + requestId));
 
         if (!findTeamRequest.getFindTeamPost().getId().equals(postId)) {
             throw new IllegalArgumentException("Post ID mismatch");
+        }
+
+        // 작성자인지 확인
+        if (!findTeamRequest.getWriterId().equals(userId)) {
+            throw new UnauthorizedAccessException("해당 신청 요청을 수정할 권한이 없습니다.");
         }
 
         FindTeamPost post = findTeamRequest.getFindTeamPost();
@@ -119,18 +128,26 @@ public class FindTeamRequestService {
 
     /**
      * 신청 요청을 삭제합니다.
+     * 작성자만 삭제할 수 있습니다.
      *
      * @param postId 게시글 ID
      * @param requestId 삭제할 신청 요청 ID
+     * @param userId 삭제를 요청한 사용자 ID
      * @throws FindTeamRequestNotFoundException 신청 요청을 찾을 수 없는 경우
      * @throws IllegalArgumentException 게시글 ID가 일치하지 않는 경우
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
      */
-    public void deleteRequest(Long postId, Long requestId) {
+    public void deleteRequest(Long postId, Long requestId, Long userId) {
         FindTeamRequest request = findTeamRequestRepository.findById(requestId)
                 .orElseThrow(() -> new FindTeamRequestNotFoundException("Cannot find request with id: " + requestId));
 
         if (!request.getFindTeamPost().getId().equals(postId)) {
             throw new IllegalArgumentException("Post ID mismatch");
+        }
+
+        // 작성자인지 확인
+        if (!request.getWriterId().equals(userId)) {
+            throw new UnauthorizedAccessException("해당 신청 요청을 삭제할 권한이 없습니다.");
         }
 
         findTeamRequestRepository.delete(request);

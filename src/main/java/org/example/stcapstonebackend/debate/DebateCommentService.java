@@ -1,6 +1,7 @@
 package org.example.stcapstonebackend.debate;
 
 import lombok.RequiredArgsConstructor;
+import org.example.stcapstonebackend.common.exception.UnauthorizedAccessException;
 import org.example.stcapstonebackend.debate.dto.DebateCommentRequest;
 import org.example.stcapstonebackend.debate.dto.DebateCommentResponse;
 import org.example.stcapstonebackend.common.exception.CommentNotFoundException;
@@ -54,8 +55,18 @@ public class DebateCommentService {
                 .toList();
     }
 
-    // 댓글 수정
-    public DebateCommentResponse updateComment(Long postId, Long commentId, DebateCommentRequest request) {
+    /**
+     * 댓글을 수정합니다.
+     * 작성자만 수정할 수 있습니다.
+     *
+     * @param postId 게시글 ID
+     * @param commentId 댓글 ID
+     * @param request 수정할 댓글 정보
+     * @param userId 수정을 요청한 사용자 ID
+     * @return 수정된 댓글 정보
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
+     */
+    public DebateCommentResponse updateComment(Long postId, Long commentId, DebateCommentRequest request, Long userId) {
         // 1. commentId로 댓글을 먼저 조회합니다.
         DebateComment comment = debateCommentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
@@ -66,7 +77,12 @@ public class DebateCommentService {
             throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
         }
 
-        // 3. 검증이 통과된 경우에만 안전하게 수정합니다.
+        // 3. 작성자인지 확인
+        if (!comment.getWriterId().equals(userId)) {
+            throw new UnauthorizedAccessException("해당 댓글을 수정할 권한이 없습니다.");
+        }
+
+        // 4. 검증이 통과된 경우에만 안전하게 수정합니다.
         // writerId 유효성 검증 (toEntity에서 수행)
         debateCommentMapper.toEntity(request);
         comment.update(request.content(), request.writerId());
@@ -74,19 +90,32 @@ public class DebateCommentService {
         return debateCommentMapper.toDto(comment);
     }
 
-    // 댓글 삭제
-    public void deleteComment(Long postId, Long commentId) {
+    /**
+     * 댓글을 삭제합니다.
+     * 작성자만 삭제할 수 있습니다.
+     *
+     * @param postId 게시글 ID
+     * @param commentId 댓글 ID
+     * @param userId 삭제를 요청한 사용자 ID
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
+     */
+    public void deleteComment(Long postId, Long commentId, Long userId) {
         // 1. commentId로 댓글을 먼저 조회합니다.
         DebateComment comment = debateCommentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("해당 댓글을 찾을 수 없습니다."));
 
-        // 조회한 댓글의 부모 게시글 ID와 URL로 넘어온 postId가 일치하는지 확인합니다.
+        // 2. 조회한 댓글의 부모 게시글 ID와 URL로 넘어온 postId가 일치하는지 확인합니다.
         if (!comment.getDebatePost().getId().equals(postId)) {
             // 일치하지 않으면, 권한이 없거나 잘못된 요청으로 간주하고 예외를 발생시킵니다.
             throw new IllegalArgumentException("게시글과 댓글의 정보가 일치하지 않습니다.");
         }
 
-        // 3. 검증이 통과된 경우에만 안전하게 삭제합니다.
+        // 3. 작성자인지 확인
+        if (!comment.getWriterId().equals(userId)) {
+            throw new UnauthorizedAccessException("해당 댓글을 삭제할 권한이 없습니다.");
+        }
+
+        // 4. 검증이 통과된 경우에만 안전하게 삭제합니다.
         debateCommentRepository.delete(comment);
     }
 

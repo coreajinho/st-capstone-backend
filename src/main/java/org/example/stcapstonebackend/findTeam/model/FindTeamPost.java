@@ -55,6 +55,41 @@ public class FindTeamPost extends BaseEntity {
     private Long writerId;
 
     /**
+     * 매치 종류 (SOLO_RANK, FLEX_RANK, OTHER_MODES)
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private MatchType matchType = MatchType.OTHER_MODES;
+
+    /**
+     * 모집하는 최소 티어 점수
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer minTierScore = 0;
+
+    /**
+     * 모집하는 최대 티어 점수
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer maxTierScore = 2799;
+
+    /**
+     * 마스터 이상 모집 여부 (자유랭크/기타모드 전용)
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean requireMasterPlus = false;
+
+    /**
+     * 마스터 이상 LP 상한 (null이면 무제한)
+     */
+    @Column
+    private Integer masterPlusLpCap;
+
+    /**
      * 게시글 상태 (ACTIVE, PENDING, MATCHED, EXPIRED)
      */
     @Enumerated(EnumType.STRING)
@@ -124,6 +159,24 @@ public class FindTeamPost extends BaseEntity {
         if (tags != null) {
             this.tags = tags;
         }
+    }
+
+    /**
+     * 게시글의 티어 범위 정보를 업데이트합니다.
+     *
+     * @param matchType 매치 종류
+     * @param minTierScore 최소 티어 점수
+     * @param maxTierScore 최대 티어 점수
+     * @param requireMasterPlus 마스터 이상 모집 여부
+     * @param masterPlusLpCap 마스터 이상 LP 상한
+     */
+    public void updateTierRange(MatchType matchType, Integer minTierScore, Integer maxTierScore,
+                                 Boolean requireMasterPlus, Integer masterPlusLpCap) {
+        this.matchType = matchType;
+        this.minTierScore = minTierScore;
+        this.maxTierScore = maxTierScore;
+        this.requireMasterPlus = requireMasterPlus;
+        this.masterPlusLpCap = masterPlusLpCap;
     }
 
     /**

@@ -4,8 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.debate.dto.DebateCommentRequest;
 import org.example.stcapstonebackend.debate.dto.DebateCommentResponse;
+import org.example.stcapstonebackend.user.UserRepository;
+import org.example.stcapstonebackend.user.exception.UserNotFoundException;
+import org.example.stcapstonebackend.user.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.List;
 public class DebateCommentController {
 
     private final DebateCommentService debateCommentService;
+    private final UserRepository userRepository;
 
     // 특정 게시글에 댓글 생성
     @PostMapping
@@ -39,19 +44,29 @@ public class DebateCommentController {
     public ResponseEntity<DebateCommentResponse> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @Valid @RequestBody DebateCommentRequest request
+            @Valid @RequestBody DebateCommentRequest request,
+            Authentication authentication
     ) {
-        DebateCommentResponse response = debateCommentService.updateComment(postId, commentId, request);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        DebateCommentResponse response = debateCommentService.updateComment(postId, commentId, request, user.getId());
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     // 댓글 id로 특정 댓글 삭제
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Long postId, // postId는 경로 일관성을 위해 받지만, 실제 로직에선 commentId만 사용
-            @PathVariable Long commentId
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            Authentication authentication
     ) {
-        debateCommentService.deleteComment(postId, commentId);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        debateCommentService.deleteComment(postId, commentId, user.getId());
         return ResponseEntity.noContent().build();
     }
 

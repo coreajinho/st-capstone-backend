@@ -2,6 +2,7 @@ package org.example.stcapstonebackend.findTeam.dto;
 
 import lombok.Builder;
 import org.example.stcapstonebackend.common.model.PositionTag;
+import org.example.stcapstonebackend.findTeam.model.MatchType;
 import org.example.stcapstonebackend.findTeam.model.PostStatus;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,11 @@ import java.util.Set;
  * @param createdAt 생성 일시
  * @param modifiedAt 수정 일시
  * @param requests 신청 요청 목록
+ * @param matchType 매치 종류
+ * @param minTier 최소 티어 범위
+ * @param maxTier 최대 티어 범위
+ * @param requireMasterPlus 마스터 이상 모집 여부
+ * @param masterPlusLpCap 마스터 이상 LP 상한
  */
 @Builder
 public record FindTeamPostResponse(
@@ -42,6 +48,11 @@ public record FindTeamPostResponse(
         int requestCount,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        List<FindTeamRequestResponse> requests
+        List<FindTeamRequestResponse> requests,
+        MatchType matchType,
+        TierRange minTier,
+        TierRange maxTier,
+        Boolean requireMasterPlus,
+        Integer masterPlusLpCap
 ) {
 }

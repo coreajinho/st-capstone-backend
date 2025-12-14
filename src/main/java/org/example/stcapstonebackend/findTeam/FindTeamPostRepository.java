@@ -107,5 +107,40 @@ public interface FindTeamPostRepository extends JpaRepository<FindTeamPost, Long
      * @return 정렬된 게시글 목록
      */
     List<FindTeamPost> findAllByOrderByCreatedAtAsc();
+
+    /**
+     * 티어 범위 교차(Range Intersection) 조건으로 게시글을 필터링합니다.
+     * 사용자가 입력한 티어 범위와 게시글의 모집 티어 범위가 조금이라도 겹치면 결과에 포함됩니다.
+     *
+     * 조건: Max(userMin, postMin) <= Min(userMax, postMax)
+     *
+     * @param userMinScore 사용자의 최소 티어 점수
+     * @param userMaxScore 사용자의 최대 티어 점수
+     * @param status 게시글 상태 (ACTIVE만 조회)
+     * @return 필터링된 게시글 목록
+     */
+    @Query("SELECT p FROM find_team_post p WHERE " +
+           "p.status = :status AND " +
+           "GREATEST(p.minTierScore, :userMinScore) <= LEAST(p.maxTierScore, :userMaxScore) " +
+           "ORDER BY p.createdAt DESC")
+    List<FindTeamPost> findByTierRangeIntersection(Integer userMinScore, Integer userMaxScore, PostStatus status);
+
+    /**
+     * 티어 범위와 매치 타입으로 게시글을 필터링합니다.
+     *
+     * @param userMinScore 사용자의 최소 티어 점수
+     * @param userMaxScore 사용자의 최대 티어 점수
+     * @param matchType 매치 타입
+     * @param status 게시글 상태
+     * @return 필터링된 게시글 목록
+     */
+    @Query("SELECT p FROM find_team_post p WHERE " +
+           "p.status = :status AND " +
+           "p.matchType = :matchType AND " +
+           "GREATEST(p.minTierScore, :userMinScore) <= LEAST(p.maxTierScore, :userMaxScore) " +
+           "ORDER BY p.createdAt DESC")
+    List<FindTeamPost> findByTierRangeAndMatchType(Integer userMinScore, Integer userMaxScore,
+                                                     org.example.stcapstonebackend.findTeam.model.MatchType matchType,
+                                                     PostStatus status);
 }
 

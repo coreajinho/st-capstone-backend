@@ -2,10 +2,7 @@ package org.example.stcapstonebackend.common.advice;
 
 import org.example.stcapstonebackend.common.exception.CommentNotFoundException;
 import org.example.stcapstonebackend.debate.exception.DebatePostNotFoundException;
-import org.example.stcapstonebackend.findTeam.exception.DuplicateAcceptanceException;
-import org.example.stcapstonebackend.findTeam.exception.FindTeamPostNotFoundException;
-import org.example.stcapstonebackend.findTeam.exception.FindTeamRequestNotFoundException;
-import org.example.stcapstonebackend.findTeam.exception.InvalidTagSelectionException;
+import org.example.stcapstonebackend.findTeam.exception.*;
 import org.example.stcapstonebackend.review.exception.DuplicateReviewException;
 import org.example.stcapstonebackend.review.exception.ReviewNotFoundException;
 import org.example.stcapstonebackend.user.exception.DuplicateEmailException;
@@ -98,6 +95,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ReviewNotFoundException.class)
     public ResponseEntity<String> handleReviewNotFoundException(ReviewNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTierRangeException.class)
+    public ResponseEntity<String> handleInvalidTierRangeException(InvalidTierRangeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 }

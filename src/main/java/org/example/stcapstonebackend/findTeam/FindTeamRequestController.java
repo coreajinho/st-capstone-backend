@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestRequest;
 import org.example.stcapstonebackend.findTeam.dto.FindTeamRequestResponse;
+import org.example.stcapstonebackend.user.UserRepository;
+import org.example.stcapstonebackend.user.exception.UserNotFoundException;
+import org.example.stcapstonebackend.user.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,6 +23,7 @@ import java.util.List;
 public class FindTeamRequestController {
 
     private final FindTeamRequestService findTeamRequestService;
+    private final UserRepository userRepository;
 
     /**
      * 특정 게시글에 새로운 신청 요청을 생성합니다.
@@ -55,15 +59,21 @@ public class FindTeamRequestController {
      * @param postId 게시글 ID
      * @param requestId 수정할 신청 요청 ID
      * @param request 수정할 신청 요청 데이터
+     * @param authentication 인증된 사용자 정보
      * @return 수정된 신청 요청 정보
      */
     @PutMapping("/api/find-team/posts/{postId}/requests/{requestId}")
     public ResponseEntity<FindTeamRequestResponse> updateRequest(
             @PathVariable Long postId,
             @PathVariable Long requestId,
-            @Valid @RequestBody FindTeamRequestRequest request
+            @Valid @RequestBody FindTeamRequestRequest request,
+            Authentication authentication
     ) {
-        FindTeamRequestResponse response = findTeamRequestService.updateRequest(postId, requestId, request);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        FindTeamRequestResponse response = findTeamRequestService.updateRequest(postId, requestId, request, user.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -72,14 +82,20 @@ public class FindTeamRequestController {
      *
      * @param postId 게시글 ID
      * @param requestId 삭제할 신청 요청 ID
+     * @param authentication 인증된 사용자 정보
      * @return 204 No Content 응답
      */
     @DeleteMapping("/api/find-team/posts/{postId}/requests/{requestId}")
     public ResponseEntity<Void> deleteRequest(
             @PathVariable Long postId,
-            @PathVariable Long requestId
+            @PathVariable Long requestId,
+            Authentication authentication
     ) {
-        findTeamRequestService.deleteRequest(postId, requestId);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        findTeamRequestService.deleteRequest(postId, requestId, user.getId());
         return ResponseEntity.noContent().build();
     }
 

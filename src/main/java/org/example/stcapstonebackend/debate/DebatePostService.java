@@ -2,6 +2,7 @@ package org.example.stcapstonebackend.debate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.stcapstonebackend.common.exception.UnauthorizedAccessException;
 import org.example.stcapstonebackend.debate.dto.DebatePostRequest;
 import org.example.stcapstonebackend.debate.dto.DebatePostResponse;
 import org.example.stcapstonebackend.debate.dto.DebateVoteResultDto;
@@ -47,10 +48,24 @@ public class DebatePostService {
         return debatePostMapper.toDto(savedPost);
     }
 
-    //  id로 게시글 수정
+    /**
+     * id로 게시글을 수정합니다.
+     * 작성자 또는 공동 작성자만 수정할 수 있습니다.
+     *
+     * @param postDto 수정할 게시글 정보
+     * @param id 게시글 ID
+     * @param userId 수정을 요청한 사용자 ID
+     * @return 수정된 게시글 정보
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
+     */
     @Transactional
-    public DebatePostResponse updatePost(DebatePostRequest postDto, Long id) {
+    public DebatePostResponse updatePost(DebatePostRequest postDto, Long id, Long userId) {
         DebatePost post = getPostEntity(id);
+
+        // 작성자 또는 공동 작성자인지 확인
+        if (!isAuthorOrCoAuthor(post, userId)) {
+            throw new UnauthorizedAccessException("해당 게시글을 수정할 권한이 없습니다.");
+        }
 
         // writerId, coWriterId 유효성 검증 (toEntity에서 수행)
         debatePostMapper.toEntity(postDto);
@@ -67,9 +82,35 @@ public class DebatePostService {
         return debatePostMapper.toDto(post);
     }
 
-    //   id로 게시글 삭제
-    public void deletePost(Long id) {
+    /**
+     * id로 게시글을 삭제합니다.
+     * 작성자 또는 공동 작성자만 삭제할 수 있습니다.
+     *
+     * @param id 게시글 ID
+     * @param userId 삭제를 요청한 사용자 ID
+     * @throws UnauthorizedAccessException 작성자가 아닌 경우
+     */
+    public void deletePost(Long id, Long userId) {
+        DebatePost post = getPostEntity(id);
+
+        // 작성자 또는 공동 작성자인지 확인
+        if (!isAuthorOrCoAuthor(post, userId)) {
+            throw new UnauthorizedAccessException("해당 게시글을 삭제할 권한이 없습니다.");
+        }
+
         debatePostRepository.deleteById(id);
+    }
+
+    /**
+     * 사용자가 게시글의 작성자 또는 공동 작성자인지 확인합니다.
+     *
+     * @param post 게시글
+     * @param userId 사용자 ID
+     * @return 작성자 또는 공동 작성자인 경우 true
+     */
+    private boolean isAuthorOrCoAuthor(DebatePost post, Long userId) {
+        return post.getWriterId().equals(userId)
+                || (post.getCoWriterId() != null && post.getCoWriterId().equals(userId));
     }
 
     //    id로 게시글 1개 조회
